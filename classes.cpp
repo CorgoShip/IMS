@@ -1,47 +1,124 @@
 #include "classes.h"
 
-int Populace::getPocetNakazenych(){
-    int suma = 0;
+TypPopulace::TypPopulace(string jmeno, int pocetNenakazenych, float mortalita){
+    nazev = jmeno;
+    this->mortalita = mortalita;
+    nenakazeni.push_back(pocetNenakazenych);
+    vystaveni.push_back(0);
+    nakazeni.push_back(0);
+    naUmreni.push_back(0);
+    mrtvi.push_back(0);
+    detekovaniNakazeni.push_back(0);
+    detekovaniUzdraveni.push_back(0);
+    nedetekovaniNakazeni.push_back(0);
+    nedetekovaniUzdraveni.push_back(0);
+}
+
+Populace::Populace(){
+    
+}
+
+Populace::Populace(vector<TypPopulace> typy){
+    typyPopulace = typy;
+}
+
+int Populace::getNenakazeni(){
+        int suma = 0;
 
     for (auto item : this->typyPopulace)
     {
-        suma += item.pocetNakazenych.back();
+        suma += item.nenakazeni.back();
     }    
 
     return suma;
 }
 
-
-int Populace::getPocetLidi(){
-    int suma = 0;
+int Populace::getVystaveni(){
+            int suma = 0;
 
     for (auto item : this->typyPopulace)
     {
-        suma += item.pocetLidi.back();
+        suma += item.vystaveni.back();
     }    
 
     return suma;
 }
 
-int Populace::getPocetVylecenych(){
-    int suma = 0;
+int Populace::getNakazeni(){
+            int suma = 0;
 
     for (auto item : this->typyPopulace)
     {
-        suma += item.pocetVylecenych.back();
+        suma += item.nakazeni.back();
     }    
 
     return suma;
 }
 
-int Populace::getPocetMrtvych(){
-    int suma = 0;
+int Populace::getNaUmreni(){
+            int suma = 0;
 
     for (auto item : this->typyPopulace)
     {
-        suma += item.pocetMrtvych.back();
+        suma += item.naUmreni.back();
     }    
 
     return suma;
 }
+
+int Populace::getMrtvi(){
+            int suma = 0;
+
+    for (auto item : this->typyPopulace)
+    {
+        suma += item.mrtvi.back();
+    }    
+
+    return suma;
+}
+
+int Populace::getDetekovaniNakazeni(){
+            int suma = 0;
+
+    for (auto item : this->typyPopulace)
+    {
+        suma += item.detekovaniNakazeni.back();
+    }    
+
+    return suma;
+}
+
+int Populace::getDetekovaniUzdraveni(){
+            int suma = 0;
+
+    for (auto item : this->typyPopulace)
+    {
+        suma += item.detekovaniUzdraveni.back();
+    }    
+
+    return suma;
+}
+
+int Populace::getNedetekovaniNakazeni(){
+            int suma = 0;
+
+    for (auto item : this->typyPopulace)
+    {
+        suma += item.nedetekovaniNakazeni.back();
+    }    
+
+    return suma;
+}
+
+int Populace::getNedetekovaniUzdraveni(){
+            int suma = 0;
+
+    for (auto item : this->typyPopulace)
+    {
+        suma += item.nedetekovaniUzdraveni.back();
+    }    
+
+    return suma;
+}
+
 

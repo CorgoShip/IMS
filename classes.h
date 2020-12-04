@@ -16,30 +16,25 @@
 
 using namespace std;
 
-/*
-    Předškolní věk (0-4) (340_400)
-
-	Studenti  (2_052_398)
-		MS (364_909) viz [1]
-		ZS (952_946) viz [1]
-		SŠ (423_838) + Konzervator (3_836) viz [1]
-		VŠ (288_915) + VOS (17_954) viz [1] a [4]
-
-	Produktivní věk (5_803_435)
-		mladší 2_761_821
-		starší 3_041_614 (40-65) [3]
-
-	Důchodci(65+) (2_403_767) [2]
-*/
-
 class TypPopulace {
     public:
-        vector<int> pocetLidi;
+        string nazev;
+        TypPopulace(string jmeno, int pocetNenakazenych, float mortalita);
+        vector<int> nenakazeni; // lide, kteri se mohou nakazit COVID
+        vector<int> vystaveni; // lide, kteri maji COVID v inkubacni dobe
+        vector<int> nakazeni; // lide, u kterych COVID propukl
+        
+        vector<int> naUmreni; //lide, kteri jsou v nemocnici a na konci nemoci umrou na COVID
+        vector<int> mrtvi; // lide, kteri umreli na COVID
+
+        vector<int> detekovaniNakazeni; // lide, kteri maji COVID, jsou detekovani siri tedy COVID s mensi pravdepodobnosti (karantena, omezeni atd.)
+        vector<int> detekovaniUzdraveni; // lide, kteri prodelali COVID, byli detekovani a jsou jiz imunni
+
+        vector<int> nedetekovaniNakazeni; // lide, kteri maji COVID, nejsou detekovani a siri tedy COVID s normlani pravdepodobnosti
+        vector<int> nedetekovaniUzdraveni; // nedetekovani lide, kteri uz jsou uzdraveni a jsou imunni
+
         int poctyKontaktu[POCET_TYPU_KONTAKTU]; // Pocet kontaktu pro jednotlive typy
-        vector<int> pocetNakazenych; // Pocet nakazenych v jednotlivych dnech,
-        double mortalita;
-        vector<int> pocetVylecenych;
-        vector<int> pocetMrtvych;
+        double mortalita; // s jakou pravdepodobnsti kde
 };
 
 class TypKontaktu {
@@ -51,10 +46,17 @@ class Populace {
   public:             
     vector<TypPopulace> typyPopulace;
 
-    int getPocetNakazenych();
-    int getPocetLidi();
-    int getPocetVylecenych();
-    int getPocetMrtvych();
+    Populace();
+    Populace(vector<TypPopulace> typy);
+    int getNenakazeni();
+    int getVystaveni();
+    int getNakazeni();
+    int getNaUmreni();
+    int getMrtvi();
+    int getDetekovaniNakazeni();
+    int getDetekovaniUzdraveni();
+    int getNedetekovaniNakazeni();
+    int getNedetekovaniUzdraveni();
 };
 
 // enum na typy populace
