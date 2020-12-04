@@ -1,8 +1,8 @@
 #IMS
 
 CC=g++
-CFLAGS=-std=gnu99
-LDFLAGS = -lssl -lcrypto
+CFLAGS=-std=c++17 #-Wall -Wextra -pedantic
+LDFLAGS = #-lssl -lcrypto -lpcap
 DEPS = classes.h
 OBJ = model.o classes.o
 
