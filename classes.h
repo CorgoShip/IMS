@@ -1,8 +1,8 @@
 /**
- *   @project: IMS (Discord bot)
- *   @file: extractor.h 
- *   @author: Šimon Pomykal (xpomyk04)
- *   @date: 18.11.2020
+ *   @project:  IMS
+ *   @file: classes.h 
+ *   @author: Šimon Pomykal (xpomyk04), Zbyněk Lamakčka (xlamac00)
+ *   @date: 5.12.2020
 */
 
 #ifndef CLASSES_H
@@ -11,52 +11,63 @@
 #include <iostream>
 #include <vector>
 
-#define POCET_TYPU_KONTAKTU 8 // zmenit
-#define POCET_TYPU_POPULACE 8
-
 using namespace std;
+
+class Kontakt {
+    public:
+        string nazev; //nazev kontaktu např školství
+        int pocetKontaktu; //kolik kontaktů daného typu osoba má
+        double koeficient; //jaký je koeficient rizika přenosu (default 1, ale např sťísněné prostory, atd. může být větší)
+        Kontakt(string nazev,int pocetKontaktu, double koeficient);
+};
+
+enum StavyPopulace{
+    nenakazeni = 0,
+    vystaveni = 1,
+    nakazeni = 2,
+    naUmreni = 3,
+    mrtvi = 4,
+    detekovaniNakazeni = 5,
+    nedetekovaniNakazeni = 6,
+    detekovaniUzdraveni = 7,
+    nedetekovaniUzdraveni = 8,
+    vNemocnici =9
+};
+
+enum TypyPopulace{
+    Predskolni = 0,
+    materskaSkola = 1,
+    zakladniSkola = 2,
+    stredniSkola = 3,
+    vysokaSkola = 4,
+    mladsiPracujici = 5,
+    starsiPracujici = 6,
+    duchodci = 7
+};
+
+class StavPopulace {
+    public:
+    StavPopulace(StavyPopulace nazevStavu, int den0);
+    StavyPopulace nazevStavu;
+    vector<int> den; //pocel lidi v danem stavu v kazdem dnu
+};
 
 class TypPopulace {
     public:
-        string nazev;
-        TypPopulace(string jmeno, int pocetNenakazenych, float mortalita);
-        vector<int> nenakazeni; // lide, kteri se mohou nakazit COVID
-        vector<int> vystaveni; // lide, kteri maji COVID v inkubacni dobe
-        vector<int> nakazeni; // lide, u kterych COVID propukl
-        
-        vector<int> naUmreni; //lide, kteri jsou v nemocnici a na konci nemoci umrou na COVID
-        vector<int> mrtvi; // lide, kteri umreli na COVID
-
-        vector<int> detekovaniNakazeni; // lide, kteri maji COVID, jsou detekovani siri tedy COVID s mensi pravdepodobnosti (karantena, omezeni atd.)
-        vector<int> detekovaniUzdraveni; // lide, kteri prodelali COVID, byli detekovani a jsou jiz imunni
-
-        vector<int> nedetekovaniNakazeni; // lide, kteri maji COVID, nejsou detekovani a siri tedy COVID s normlani pravdepodobnosti
-        vector<int> nedetekovaniUzdraveni; // nedetekovani lide, kteri uz jsou uzdraveni a jsou imunni
-
-        int poctyKontaktu[POCET_TYPU_KONTAKTU]; // Pocet kontaktu pro jednotlive typy
-        double mortalita; // s jakou pravdepodobnsti kde
-};
-
-class TypKontaktu {
-    public:
-        double nakazeniTypuPopulace[POCET_TYPU_POPULACE]; // S 
+        TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita);
+        TypyPopulace nazevTypu;
+        vector<StavPopulace> stavy; //stavy ve kterych lide mohou byt
+        vector<Kontakt> kontakty; //kontakty ktere lidi denne podstoupi
+        double mortalita; // s jakou pravdepodobnsti nakazeny pujde do skupiny naUmreni
 };
 
 class Populace {       
   public:             
-    vector<TypPopulace> typyPopulace;
+    vector<TypPopulace> typyPopulace; //typy populace
+    int pocetDni; //kolik dni vyvoje je zaznamenano
 
     Populace();
-    Populace(vector<TypPopulace> typy);
-    int getNenakazeni();
-    int getVystaveni();
-    int getNakazeni();
-    int getNaUmreni();
-    int getMrtvi();
-    int getDetekovaniNakazeni();
-    int getDetekovaniUzdraveni();
-    int getNedetekovaniNakazeni();
-    int getNedetekovaniUzdraveni();
+    int getstav(StavyPopulace nazevStavu, int cisloDne);
 };
 
 // enum na typy populace

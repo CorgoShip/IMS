@@ -1,4 +1,17 @@
+/**
+ *   @project:  IMS
+ *   @file: model.cpp
+ *   @author: Šimon Pomykal (xpomyk04), Zbyněk Lamakčka (xlamac00)
+ *   @date: 5.12.2020
+*/
+
 #include "classes.h"
+#include <ctime>
+
+#define RIZIKO_PRENOSU 4 //šance přenosu v procentech
+#define POCET_TYPU_KONTAKTU 9 // zmenit
+#define POCET_TYPU_POPULACE 8
+#define POCET_STAVU_POPULACE 10
 
 /*
     Předškolní věk  (340_400)
@@ -23,42 +36,9 @@
             0-39: 0.2%
             40-64: 0,85%
             65+: 8,8% */
-Populace pop_setup(){
-
-    vector<TypPopulace> typy;
-
-    TypPopulace PS("predskolni vek",340'400, 0.0);
-    typy.push_back(PS);
-
-    TypPopulace MS("materska skola",364'909, 0.0);
-    typy.push_back(MS);
-
-    TypPopulace ZS("zakladni skola",952'946, 0.2);
-    typy.push_back(ZS);
-
-    TypPopulace SS("stredni skola",427'674, 0.2);
-    typy.push_back(SS);
-
-    TypPopulace VS("vysoka skola", 306'869, 0.2);
-    typy.push_back(VS);
-
-    TypPopulace PVM("mladsi produktivni vek", 2'761'821,0.2);
-    typy.push_back(PVM);
-
-    TypPopulace PVS("starsi produktivni vek", 3'041'614, 0.85);
-    typy.push_back(PVS);
-
-    TypPopulace D("duchodci", 2'403'767, 8.8);
-    typy.push_back(D);
-
-    Populace ceskaPopulace;
-    ceskaPopulace.typyPopulace = typy;
-
-    return ceskaPopulace;
-}
 
 /* Tato funkce je jenom na debugg */
-void popInfo(Populace pop){
+/* void popInfo(Populace pop){
     cout << "-----------------------------------------------------\n";
     
     cout << "Populace - nenakazeni: " << pop.getNenakazeni() << '\n';
@@ -88,44 +68,62 @@ void popInfo(Populace pop){
     }
 
     cout << "-----------------------------------------------------\n";
+} */
+
+/**
+ * Funkce která vrátí True s šancí x, jinak vrátí false (max 2 desetinná místa!!!)
+ * @param x šance v procentech
+ */
+bool chance(float x ){
+    float max = 10000;
+    x = 100*x;
+    int nahodneCislo = rand() % 10000;
+    cout << x << " " << nahodneCislo << "\n";
+
+    if(nahodneCislo <= x){
+        cout << "true\n";
+        return true;
+    }
+
+    else{
+        cout << "false\n";
+        return false;
+    }
 }
+
+/**
+ * Změna v populaci za jeden den
+ * @param pop populace
+ */
+
+/* void denniZmena(Populace &pop){
+    for(auto popTyp : pop.typyPopulace){
+        switch (popTyp.nazev){
+            case vystaveni:
+                break;
+            case nakazeni:
+                break;
+            
+
+            case nenakazeni:
+            default:
+                break;
+        }
+    }
+} */
 
 int main(int argc, char* argv[]){
 
-    Populace ceskaPopulace = pop_setup();
-    ceskaPopulace.typyPopulace[0].nakazeni[0] = 1;
-    popInfo(ceskaPopulace);
+    /* initialize random seed: */
+    srand (time(NULL));
 
-/*     Populace population;
-    population.celkem = 100;
+    Populace ceskaPopulace = Populace();
+    cout << "celkem nenakazeni:" << ceskaPopulace.getstav(nenakazeni,1) << '\n';
+    
 
-    const int POCET_DNI = 1000; // TODO zmenit
-
-    int populace = 10'600'000; // class
-    int pocetNakzenych = 1; // vector
-
-    double nakazlivost_viru = 0.1; // zmenit na realne
-
-     class kontakty */
-
-
-
-    // int pocet_kontaktu =  
-
-
-    // for (int i = 0; i < POCET_DNI; i++)
-    // {
-    //     /* code */
-    //     // pocet nakazenych = 10 000 000;
-    //     // prirustek += pocet nakazencyh * nakazlivost * pocet kontaktu;
-
-    //     for (int j = 0; j < POCET_TYPU_POPULACE; j++)
-    //     {
-    //         /* code */
-    //     }
-        
-        
-    // }
+    
+    //denniZmena(ceskaPopulace);
+    //popInfo(ceskaPopulace);
 
     return 0;
 }

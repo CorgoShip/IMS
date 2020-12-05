@@ -1,122 +1,64 @@
+/**
+ *   @project:  IMS
+ *   @file: classes.cpp
+ *   @author: Šimon Pomykal (xpomyk04), Zbyněk Lamakčka (xlamac00)
+ *   @date: 5.12.2020
+*/
+
 #include "classes.h"
 
-TypPopulace::TypPopulace(string jmeno, int pocetNenakazenych, float mortalita){
-    nazev = jmeno;
+Kontakt::Kontakt(string nazev,int pocetKontaktu, double koeficient){
+    this->nazev = nazev;
+    this->pocetKontaktu = pocetKontaktu;
+    this->koeficient = koeficient;
+}
+
+StavPopulace::StavPopulace(StavyPopulace nazevStavu, int den0){
+    this->nazevStavu = nazevStavu;
+    this->den.push_back(den0);
+}
+
+TypPopulace::TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita){
     this->mortalita = mortalita;
-    nenakazeni.push_back(pocetNenakazenych);
-    vystaveni.push_back(0);
-    nakazeni.push_back(0);
-    naUmreni.push_back(0);
-    mrtvi.push_back(0);
-    detekovaniNakazeni.push_back(0);
-    detekovaniUzdraveni.push_back(0);
-    nedetekovaniNakazeni.push_back(0);
-    nedetekovaniUzdraveni.push_back(0);
+    this->nazevTypu = nazevTypu;
+    
+    this->stavy.push_back(StavPopulace(nenakazeni,pocetNenakazenych));
+    this->stavy.push_back(StavPopulace(vystaveni,0));
+    this->stavy.push_back(StavPopulace(nakazeni,0));
+    this->stavy.push_back(StavPopulace(naUmreni,0));
+    this->stavy.push_back(StavPopulace(mrtvi,0));
+    this->stavy.push_back(StavPopulace(detekovaniNakazeni,0));
+    this->stavy.push_back(StavPopulace(nedetekovaniNakazeni,0));
+    this->stavy.push_back(StavPopulace(detekovaniUzdraveni,0));
+    this->stavy.push_back(StavPopulace(nedetekovaniUzdraveni,0));
+    this->stavy.push_back(StavPopulace(vNemocnici,0));
 }
 
 Populace::Populace(){
-    
+    this->pocetDni = 1;
+    this->typyPopulace.push_back(TypPopulace(Predskolni,340'400, 0.0));
+    this->typyPopulace.push_back(TypPopulace (materskaSkola,364'909, 0.0));
+    this->typyPopulace.push_back(TypPopulace(zakladniSkola,952'946, 0.2));
+    this->typyPopulace.push_back(TypPopulace(stredniSkola,427'674, 0.2));
+    this->typyPopulace.push_back(TypPopulace(vysokaSkola,306'869, 0.2));
+    this->typyPopulace.push_back(TypPopulace(mladsiPracujici,2'761'821, 0.2));
+    this->typyPopulace.push_back(TypPopulace(starsiPracujici,3'041'614, 0.85));
+    this->typyPopulace.push_back(TypPopulace(duchodci,2'403'767, 8.8));
 }
 
-Populace::Populace(vector<TypPopulace> typy){
-    typyPopulace = typy;
-}
 
-int Populace::getNenakazeni(){
+int Populace::getstav(StavyPopulace nazevStavu, int cisloDne){
         int suma = 0;
 
-    for (auto item : this->typyPopulace)
+    for(TypPopulace typ : this->typyPopulace)
     {
-        suma += item.nenakazeni.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getVystaveni(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.vystaveni.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getNakazeni(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.nakazeni.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getNaUmreni(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.naUmreni.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getMrtvi(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.mrtvi.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getDetekovaniNakazeni(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.detekovaniNakazeni.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getDetekovaniUzdraveni(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.detekovaniUzdraveni.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getNedetekovaniNakazeni(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.nedetekovaniNakazeni.back();
-    }    
-
-    return suma;
-}
-
-int Populace::getNedetekovaniUzdraveni(){
-            int suma = 0;
-
-    for (auto item : this->typyPopulace)
-    {
-        suma += item.nedetekovaniUzdraveni.back();
-    }    
+        for(StavPopulace stav : typ.stavy){
+            if(stav.nazevStavu == nazevStavu)
+            {
+                suma += stav.den[cisloDne-1];
+            }
+        }
+    }
 
     return suma;
 }
