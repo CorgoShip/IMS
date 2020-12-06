@@ -153,7 +153,7 @@ void denniZmena(Populace &pop){
 
     /* Nakaženi populace */
     //typy populace
-    for(auto &popTyp : pop.typyPopulace){
+    for(TypPopulace &popTyp : pop.typyPopulace){
         //nakazeni
         for(int i = popTyp.stavy[nakazeni].den.back(); i > 0; i--){
             //kontakty
@@ -165,17 +165,34 @@ void denniZmena(Populace &pop){
             }
             
         }
+    }
 
-        popTyp.stavy[zdravi]
-        /**********************************************************************************/
-        /*Přechody mezi stavy dané časem*/
+    /*Přechody mezi stavy dané časem*/
+    for(TypPopulace &popTyp : pop.typyPopulace){
         // nakažení -> imuni (delka nemoci)
         //           -> mrtví
-        // imnui -> zdravi (delka imunity) 
+        int pocet = popTyp.stavy[nakazeni].prechod.front; 
+        for (int i = 0; i < pocet; i++)
+        {
+            //umrti
+            if(chance(popTyp.mortalita)){
+                prirustek_mrtvi[popTyp.nazevTypu] += 1;
+            }
 
+            prirustek_imuni[popTyp.nazevTypu] += 1;
+        }
         
+        popTyp.stavy[nakazeni].prechod.pop; 
 
+        // imnuni -> zdravi (delka imunity)
+        prirustek_zdravi[popTyp.nazevTypu] += popTyp.stavy[imuni].prechod.front;
+        popTyp.stavy[imuni].prechod.pop; 
+    }
 
+    /*PUSH front*/
+    for(TypPopulace &popTyp : pop.typyPopulace){
+        popTyp.stavy[nakazeni].prechod.push(prirustek_nakazeni[popTyp.nazevTypu]);
+        popTyp.stavy[imuni].prechod.push(prirustek_imuni[popTyp.nazevTypu]);
     }
 
     pop.pocetDni++;

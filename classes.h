@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <vector>
+#include <queue> 
 
 using namespace std;
 
@@ -33,11 +34,11 @@ enum TypyPopulace{
 
 class StavPopulace {
     public:
-    StavPopulace(StavyPopulace nazevStavu, int den0);
+    StavPopulace(StavyPopulace nazevStavu, int den0, int delkaPrechodu);
     StavyPopulace nazevStavu;
     vector<int> den; //pocel lidi v danem stavu v kazdem dnu
-    vector<int> prechod;
-    void pridatDen(int hodnota, int prechodHodnota);
+    queue<int> prechod;
+    void pridatDen(int hodnota, StavyPopulace nazevStavu);
 };
 
 class TypPopulace {

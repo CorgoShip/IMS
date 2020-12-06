@@ -12,10 +12,10 @@ Kontakt::Kontakt(string nazev,int pocetKontaktu, double koeficient){
     this->pocetKontaktu = pocetKontaktu;
 }
 
-StavPopulace::StavPopulace(StavyPopulace nazevStavu, int den0){
+StavPopulace::StavPopulace(StavyPopulace nazevStavu, int den0, int delkaPrechodu){
     this->nazevStavu = nazevStavu;
     this->den.push_back(den0);
-    this->prechod = vector<int>()
+    this->prechod =  queue<int>(delkaPrechodu,0);
 }
 
 TypPopulace::TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita){
