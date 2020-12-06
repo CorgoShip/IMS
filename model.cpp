@@ -91,6 +91,79 @@ bool chance(float x ){
     }
 }
 
+// Funkce vraci soucet prvnich n hodnot ve Vectoru, vector musi obsahovat inty!!
+int getVectorSum(vector<int> vec, int pocetHodnot){
+
+    if (vec.size() < pocetHodnot)
+    {
+        cout << "ERROR: getVectorSum: Vector nesmi byt kratsi nez pocet scitanych hodnot\n";
+        exit(1);
+    }
+
+    int sum = 0;
+
+    for (int i = 0; i < pocetHodnot; i++)
+    {
+        sum += vec[i];
+    }
+    
+    return sum;    
+}
+
+/**
+ *  Funkce vrati index nakazene skupiny
+ * @param vec Vektor sanci nakazeni urcite skupiny
+ */
+int chooseOneFromEight(vector<int> vec){
+    int nahodneCislo = rand() % 100;
+
+    // vec.
+
+    if (vec.size() != 8)
+    {
+        cout << "ERROR: chooseOneFromEight: Vector musi mit delku 8\n";
+        exit(1);
+    }
+    
+    if (nahodneCislo < getVectorSum(vec, 1))
+    {
+        return 0;
+    }
+    else if (nahodneCislo < getVectorSum(vec, 2))
+    {
+        return 1;
+    }
+    else if (nahodneCislo < getVectorSum(vec, 3))
+    {
+        return 2;
+    }
+    else if (nahodneCislo < getVectorSum(vec, 4))
+    {
+        return 3;
+    }
+    else if (nahodneCislo < getVectorSum(vec, 5))
+    {
+        return 4;
+    }
+    else if (nahodneCislo < getVectorSum(vec, 6))
+    {
+        return 5;
+    }
+    else if (nahodneCislo < getVectorSum(vec, 7))
+    {
+        return 6;
+    }
+    else if (nahodneCislo < getVectorSum(vec, 8))
+    {
+        return 7;
+    }
+    else
+    {
+        cout << "ERROR: chooseOneFromEight: Vysla nam pravepodobnost mimo rozsah\n";
+        exit(1);
+    }
+}
+
 /**
  * Změna v populaci za jeden den
  * @param pop populace
@@ -119,8 +192,24 @@ int main(int argc, char* argv[]){
 
     Populace ceskaPopulace = Populace();
     cout << "celkem nenakazeni:" << ceskaPopulace.getstav(nenakazeni,1) << '\n';
-    
 
+
+    vector<int> test{10, 10, 20, 10, 30, 10, 5, 5};
+    vector<int> vysledky(8, 0);
+    // test.push_back(5);
+    for (size_t i = 0; i < 1000; i++)
+    {
+        int result = chooseOneFromEight(test);
+        vysledky[result]++;
+
+    }
+    
+    cout << "VYSLEDKY:\n";
+    for (auto item : vysledky)
+    {
+        cout << item << "\n";
+    }
+    
     
     //denniZmena(ceskaPopulace);
     //popInfo(ceskaPopulace);
