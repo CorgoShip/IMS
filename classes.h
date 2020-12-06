@@ -13,25 +13,11 @@
 
 using namespace std;
 
-class Kontakt {
-    public:
-        string nazev; //nazev kontaktu např školství
-        int pocetKontaktu; //kolik kontaktů daného typu osoba má
-        double koeficient; //jaký je koeficient rizika přenosu (default 1, ale např sťísněné prostory, atd. může být větší)
-        Kontakt(string nazev,int pocetKontaktu, double koeficient);
-};
-
 enum StavyPopulace{
-    nenakazeni = 0,
-    vystaveni = 1,
-    nakazeni = 2,
-    naUmreni = 3,
-    mrtvi = 4,
-    detekovaniNakazeni = 5,
-    nedetekovaniNakazeni = 6,
-    detekovaniUzdraveni = 7,
-    nedetekovaniUzdraveni = 8,
-    vNemocnici = 9
+    zdravi = 0,
+    nakazeni = 1,
+    mrtvi = 2,
+    imuni = 3
 };
 
 enum TypyPopulace{
@@ -50,14 +36,16 @@ class StavPopulace {
     StavPopulace(StavyPopulace nazevStavu, int den0);
     StavyPopulace nazevStavu;
     vector<int> den; //pocel lidi v danem stavu v kazdem dnu
+    vector<int> prechod;
+    void pridatDen(int hodnota, int prechodHodnota);
 };
 
 class TypPopulace {
     public:
-        TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita);
+        TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita,vector<int> kontakty);
         TypyPopulace nazevTypu;
         vector<StavPopulace> stavy; //stavy ve kterych lide mohou byt
-        vector<Kontakt> kontakty; //kontakty ktere lidi denne podstoupi
+        vector<int> kontakty; //kontakty ktere lidi denne podstoupi
         double mortalita; // s jakou pravdepodobnsti nakazeny pujde do skupiny naUmreni
 };
 

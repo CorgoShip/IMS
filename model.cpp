@@ -8,10 +8,13 @@
 #include "classes.h"
 #include <ctime>
 
-#define RIZIKO_PRENOSU 4 //šance přenosu v procentech
+#define RIZIKO_PRENOSU 4.0 //šance přenosu v procentech
 #define POCET_TYPU_KONTAKTU 9 // zmenit
 #define POCET_TYPU_POPULACE 8
-#define POCET_STAVU_POPULACE 10
+#define POCET_STAVU_POPULACE 4
+#define INKUBACNI_DOBA 5
+#define DELKA_IMUNITY 90
+#define TRVANI_NEMOCI 14
 
 /*
     Předškolní věk  (340_400)
@@ -38,37 +41,28 @@
             65+: 8,8% */
 
 /* Tato funkce je jenom na debugg */
-/* void popInfo(Populace pop){
+void popInfo(Populace pop, int den){
     cout << "-----------------------------------------------------\n";
     
-    cout << "Populace - nenakazeni: " << pop.getNenakazeni() << '\n';
-    cout << "Populace - vystaveni: " << pop.getVystaveni() << '\n';
-    cout << "Populace - nakazeni: " << pop.getNakazeni() << '\n';
-    cout << "Populace - detekovaniNakazeni: " << pop.getDetekovaniNakazeni() << '\n';
-    cout << "Populace - nedetekovaniNakazeni: " << pop.getNedetekovaniNakazeni() << '\n';
-    cout << "Populace - naUmreni: " << pop.getNaUmreni() << '\n';
-    cout << "Populace - mrtvi: " << pop.getMrtvi() << '\n';
-    cout << "Populace - detekovaniUzdraveni: " << pop.getDetekovaniUzdraveni() << '\n';
-    cout << "Populace - nedetekovaniUzdraveni: " << pop.getNedetekovaniUzdraveni() << '\n';
+    cout << "Populace - zdravi: " << pop.getstav(zdravi, den) << '\n';
+    cout << "Populace - nakazeni: " << pop.getstav(nakazeni, den) << '\n';
+    cout << "Populace - mrtvi: " << pop.getstav(mrtvi, den) << '\n';
+    cout << "Populace - imuni: " << pop.getstav(imuni, den) << '\n';
+
     
 
-    for(auto item : pop.typyPopulace){
+    for(TypPopulace typ: pop.typyPopulace){
         cout << '\n';
-        cout << item.nazev << '\n';
-        cout << "   nenakazeni: " << item.nenakazeni.back() << '\n';
-        cout << "   vystaveni: " << item.vystaveni.back() << '\n';
-        cout << "   nakazeni: " << item.nakazeni.back() << '\n';
-        cout << "   detekovaniNakazeni: " << item.detekovaniNakazeni.back() << '\n';
-        cout << "   nedetekovaniNakazeni: " << item.nedetekovaniNakazeni.back() << '\n';
-        cout << "   naUmreni: " << item.naUmreni.back() << '\n';
-        cout << "   mrtvi:: " << item.mrtvi.back() << '\n';
-        cout << "   detekovaniUzdraveni: " << item.detekovaniUzdraveni.back() << '\n';
-        cout << "   nedetekovaniUzdraveni: " << item.nedetekovaniUzdraveni.back() << '\n';
-        cout << "   mortalita: " << item.mortalita << '\n';
+        cout << typ.nazevTypu << '\n';
+        cout << "   zdravi: " << typ.stavy[zdravi].den[den] << '\n';
+        cout << "   nakazeni: " << typ.stavy[nakazeni].den[den] << '\n';
+        cout << "   mrtvi:: " << typ.stavy[mrtvi].den[den] << '\n';
+        cout << "   detekovaniUzdraveni: " << typ.stavy[imuni].den[den] << '\n';
+        cout << "   mortalita: " << typ.mortalita << '\n';
     }
 
     cout << "-----------------------------------------------------\n";
-} */
+} 
 
 /**
  * Funkce která vrátí True s šancí x, jinak vrátí false (max 2 desetinná místa!!!)
@@ -78,36 +72,17 @@ bool chance(float x ){
     float max = 10000;
     x = 100*x;
     int nahodneCislo = rand() % 10000;
-    cout << x << " " << nahodneCislo << "\n";
+    //cout << x << " " << nahodneCislo << "\n";
 
     if(nahodneCislo <= x){
-        cout << "true\n";
+        //cout << "true\n";
         return true;
     }
 
     else{
-        cout << "false\n";
+        //cout << "false\n";
         return false;
     }
-}
-
-// Funkce vraci soucet prvnich n hodnot ve Vectoru, vector musi obsahovat inty!!
-int getVectorSum(vector<int> vec, int pocetHodnot){
-
-    if (vec.size() < pocetHodnot)
-    {
-        cout << "ERROR: getVectorSum: Vector nesmi byt kratsi nez pocet scitanych hodnot\n";
-        exit(1);
-    }
-
-    int sum = 0;
-
-    for (int i = 0; i < pocetHodnot; i++)
-    {
-        sum += vec[i];
-    }
-    
-    return sum;    
 }
 
 /**
@@ -169,21 +144,42 @@ int chooseOneFromEight(vector<int> vec){
  * @param pop populace
  */
 
-/* void denniZmena(Populace &pop){
-    for(auto popTyp : pop.typyPopulace){
-        switch (popTyp.nazev){
-            case vystaveni:
-                break;
-            case nakazeni:
-                break;
-            
+void denniZmena(Populace &pop){
 
-            case nenakazeni:
-            default:
-                break;
+    vector<int> prirustek_nakazeni(POCET_TYPU_POPULACE,0);
+    vector<int> prirustek_zdravi(POCET_TYPU_POPULACE,0);
+    vector<int> prirustek_imuni(POCET_TYPU_POPULACE,0);
+    vector<int> prirustek_mrtvi(POCET_TYPU_POPULACE,0);
+
+    /* Nakaženi populace */
+    //typy populace
+    for(auto &popTyp : pop.typyPopulace){
+        //nakazeni
+        for(int i = popTyp.stavy[nakazeni].den.back(); i > 0; i--){
+            //kontakty
+            for (int j = 0; j < POCET_TYPU_KONTAKTU; j++){
+                if(chance(RIZIKO_PRENOSU)){
+                    //pridat do prirustku nakazenych podle pravdepodobnosti
+                    prirustek_nakazeni[popTyp.nazevTypu]++;
+                }
+            }
+            
         }
+
+        popTyp.stavy[zdravi]
+        /**********************************************************************************/
+        /*Přechody mezi stavy dané časem*/
+        // nakažení -> imuni (delka nemoci)
+        //           -> mrtví
+        // imnui -> zdravi (delka imunity) 
+
+        
+
+
     }
-} */
+
+    pop.pocetDni++;
+}
 
 int main(int argc, char* argv[]){
 
@@ -191,28 +187,18 @@ int main(int argc, char* argv[]){
     srand (time(NULL));
 
     Populace ceskaPopulace = Populace();
-    cout << "celkem nenakazeni:" << ceskaPopulace.getstav(nenakazeni,1) << '\n';
 
+    popInfo(ceskaPopulace,0);
 
-    vector<int> test{10, 10, 20, 10, 30, 10, 5, 5};
-    vector<int> vysledky(8, 0);
-    // test.push_back(5);
-    for (size_t i = 0; i < 1000; i++)
-    {
-        int result = chooseOneFromEight(test);
-        vysledky[result]++;
-
+    for (int i = 0; i < 100; i++){
+        denniZmena(ceskaPopulace);
+        cout << "den " << ceskaPopulace.pocetDni << '\n';
+        cout << "Populace - zdravi: " << ceskaPopulace.getstav(zdravi, ceskaPopulace.pocetDni) << '\n';
+        cout << "Populace - nakazeni: " << ceskaPopulace.getstav(nakazeni, ceskaPopulace.pocetDni) << '\n';
     }
-    
-    cout << "VYSLEDKY:\n";
-    for (auto item : vysledky)
-    {
-        cout << item << "\n";
-    }
-    
     
     //denniZmena(ceskaPopulace);
-    //popInfo(ceskaPopulace);
+    //popInfo(ceskaPopulace,0);
 
     return 0;
 }

@@ -10,32 +10,27 @@
 Kontakt::Kontakt(string nazev,int pocetKontaktu, double koeficient){
     this->nazev = nazev;
     this->pocetKontaktu = pocetKontaktu;
-    this->koeficient = koeficient;
 }
 
 StavPopulace::StavPopulace(StavyPopulace nazevStavu, int den0){
     this->nazevStavu = nazevStavu;
     this->den.push_back(den0);
+    this->prechod = vector<int>()
 }
 
 TypPopulace::TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita){
     this->mortalita = mortalita;
     this->nazevTypu = nazevTypu;
     
-    this->stavy.push_back(StavPopulace(nenakazeni,pocetNenakazenych));
-    this->stavy.push_back(StavPopulace(vystaveni,0));
+    this->stavy.push_back(StavPopulace(zdravi,pocetNenakazenych));
     this->stavy.push_back(StavPopulace(nakazeni,0));
-    this->stavy.push_back(StavPopulace(naUmreni,0));
     this->stavy.push_back(StavPopulace(mrtvi,0));
-    this->stavy.push_back(StavPopulace(detekovaniNakazeni,0));
-    this->stavy.push_back(StavPopulace(nedetekovaniNakazeni,0));
-    this->stavy.push_back(StavPopulace(detekovaniUzdraveni,0));
-    this->stavy.push_back(StavPopulace(nedetekovaniUzdraveni,0));
-    this->stavy.push_back(StavPopulace(vNemocnici,0));
+    this->stavy.push_back(StavPopulace(imuni,0));
+
 }
 
 Populace::Populace(){
-    this->pocetDni = 1;
+    this->pocetDni = 0;
     this->typyPopulace.push_back(TypPopulace(Predskolni,340'400, 0.0));
     this->typyPopulace.push_back(TypPopulace (materskaSkola,364'909, 0.0));
     this->typyPopulace.push_back(TypPopulace(zakladniSkola,952'946, 0.2));
@@ -55,7 +50,7 @@ int Populace::getstav(StavyPopulace nazevStavu, int cisloDne){
         for(StavPopulace stav : typ.stavy){
             if(stav.nazevStavu == nazevStavu)
             {
-                suma += stav.den[cisloDne-1];
+                suma += stav.den[cisloDne];
             }
         }
     }
@@ -63,4 +58,8 @@ int Populace::getstav(StavyPopulace nazevStavu, int cisloDne){
     return suma;
 }
 
+void StavPopulace::pridatDen(int hodnota,StavyPopulace nazevStavu){
+        int predchoziNE = this->den.back();
+        popTyp.stavy[nazevStavu].den.push_back(predchoziNE - hodnota);
+}
 
