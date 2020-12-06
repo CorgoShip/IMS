@@ -12,9 +12,7 @@
 #define POCET_TYPU_KONTAKTU 9 // zmenit
 #define POCET_TYPU_POPULACE 8
 #define POCET_STAVU_POPULACE 4
-#define INKUBACNI_DOBA 5
-#define DELKA_IMUNITY 90
-#define TRVANI_NEMOCI 14
+#define POCET_TYPU_KONTAKTU 7
 
 /*
     Předškolní věk  (340_400)
@@ -156,11 +154,15 @@ void denniZmena(Populace &pop){
     for(TypPopulace &popTyp : pop.typyPopulace){
         //nakazeni
         for(int i = popTyp.stavy[nakazeni].den.back(); i > 0; i--){
-            //kontakty
-            for (int j = 0; j < POCET_TYPU_KONTAKTU; j++){
-                if(chance(RIZIKO_PRENOSU)){
-                    //pridat do prirustku nakazenych podle pravdepodobnosti
-                    prirustek_nakazeni[popTyp.nazevTypu]++;
+            //typykontaktu
+            for(int j = 0; j < POCET_TYPU_KONTAKTU;j++){
+                //pocetkontaktu
+                for (int y = 0; y < popTyp.kontakty[j];y++){
+                    if(chance(RIZIKO_PRENOSU)){
+                        int index = chooseOneFromEight(vector<int>{12,12,13,13,13,13,12,12});
+                        prirustek_nakazeni[index] += 1;
+                        prirustek_zdravi[index] -= 1;
+                    }
                 }
             }
             
@@ -174,18 +176,22 @@ void denniZmena(Populace &pop){
         int pocet = popTyp.stavy[nakazeni].prechod.front; 
         for (int i = 0; i < pocet; i++)
         {
+            prirustek_nakazeni[popTyp.nazevTypu] -= 1;
             //umrti
             if(chance(popTyp.mortalita)){
                 prirustek_mrtvi[popTyp.nazevTypu] += 1;
             }
 
-            prirustek_imuni[popTyp.nazevTypu] += 1;
+            else{
+                prirustek_imuni[popTyp.nazevTypu] += 1;
+            }
         }
         
         popTyp.stavy[nakazeni].prechod.pop; 
 
         // imnuni -> zdravi (delka imunity)
         prirustek_zdravi[popTyp.nazevTypu] += popTyp.stavy[imuni].prechod.front;
+        prirustek_imuni[popTyp.nazevTypu] -= popTyp.stavy[imuni].prechod.front;
         popTyp.stavy[imuni].prechod.pop; 
     }
 
@@ -193,6 +199,11 @@ void denniZmena(Populace &pop){
     for(TypPopulace &popTyp : pop.typyPopulace){
         popTyp.stavy[nakazeni].prechod.push(prirustek_nakazeni[popTyp.nazevTypu]);
         popTyp.stavy[imuni].prechod.push(prirustek_imuni[popTyp.nazevTypu]);
+
+        popTyp.stavy[zdravi].pridatDen(prirustek_zdravi[popTyp.nazevTypu]);
+        popTyp.stavy[nakazeni].pridatDen(prirustek_nakazeni[popTyp.nazevTypu]);
+        popTyp.stavy[imuni].pridatDen(prirustek_imuni[popTyp.nazevTypu]);
+        popTyp.stavy[mrtvi].pridatDen(prirustek_mrtvi[popTyp.nazevTypu]);
     }
 
     pop.pocetDni++;
@@ -205,9 +216,10 @@ int main(int argc, char* argv[]){
 
     Populace ceskaPopulace = Populace();
 
+    ceskaPopulace.typyPopulace[mladsiPracujici].stavy[nakazeni][ceskaPopulace.pocetDni] = 1;
     popInfo(ceskaPopulace,0);
 
-    for (int i = 0; i < 100; i++){
+    for (int i = 0; i < 30; i++){
         denniZmena(ceskaPopulace);
         cout << "den " << ceskaPopulace.pocetDni << '\n';
         cout << "Populace - zdravi: " << ceskaPopulace.getstav(zdravi, ceskaPopulace.pocetDni) << '\n';

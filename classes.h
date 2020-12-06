@@ -32,6 +32,16 @@ enum TypyPopulace{
     duchodci = 7
 };
 
+enum TypyKontaktu{
+    skolstvi = 0,
+    nakupovani = 1,	
+    kultura = 2,
+    sport = 3, 	
+    sluzby = 4, 
+    spolecenskeAkce = 5,
+    restaurace = 6  // obsahuje restaurace + hospody + kluby
+};
+
 class StavPopulace {
     public:
     StavPopulace(StavyPopulace nazevStavu, int den0, int delkaPrechodu);
@@ -43,7 +53,7 @@ class StavPopulace {
 
 class TypPopulace {
     public:
-        TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita,vector<int> kontakty);
+        TypPopulace(TypyPopulace nazevTypu, int pocetNenakazenych, float mortalita, vector<int> kontakty);
         TypyPopulace nazevTypu;
         vector<StavPopulace> stavy; //stavy ve kterych lide mohou byt
         vector<int> kontakty; //kontakty ktere lidi denne podstoupi
