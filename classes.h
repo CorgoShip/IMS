@@ -31,7 +31,7 @@ enum StavyPopulace{
     nedetekovaniNakazeni = 6,
     detekovaniUzdraveni = 7,
     nedetekovaniUzdraveni = 8,
-    vNemocnici =9
+    vNemocnici = 9
 };
 
 enum TypyPopulace{
