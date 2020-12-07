@@ -466,6 +466,7 @@ void denniZmena(Populace &pop, deque<int> &pes_prirustek,deque<int> &pes_prirust
         prirustek14 += value;
     }
 
+    prirustek14 = prirustek14;
     //2.
     int prirustek65 = prirustek_nakazeni[duchodci];
     pes_prirustek65.push_back(prirustek65);
@@ -475,6 +476,8 @@ void denniZmena(Populace &pop, deque<int> &pes_prirustek,deque<int> &pes_prirust
     for(int value : pes_prirustek65){
         prirustek6514 += value;
     }
+
+    prirustek6514 = prirustek6514;
 
     //3. 
     //cout << "---------------\n";
