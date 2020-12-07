@@ -172,12 +172,17 @@ int chooseOneFromEight(vector<int> vec){
     }
 }
 
+int pes_vypocet(int prirustek, int prirustek65, double r_cislo, double pozitivita_pop){
+    int score = 0;
+}
+
+
+
 /**
  * Změna v populaci za jeden den
  * @param pop populace
  */
-
-void denniZmena(Populace &pop){
+void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirustek65, int &posledni_prirustek){
     vector<vector<double>> pes {
     {1.0,0.95,0.9,0.9,0.85,0.80},
     {1.0,0.95,0.80,0.70,0.10,0.05},
@@ -188,13 +193,7 @@ void denniZmena(Populace &pop){
     {1.0,0.9,0.8,0.5,0.05,0.05}
 };
 
-    cout << pop.pocetDni << '\n';
-    cout << pop.getstav(zdravi,pop.pocetDni) << '\n';
-
-    double podil_zdravych = pop.getstav(zdravi,pop.pocetDni) / 10600000.0;
-
-    cout << podil_zdravych << '\n';
-
+    double podilZdravych = pop.getstav(zdravi,pop.pocetDni) / 10600000.0;
 
     vector<int> prirustek_nakazeni(POCET_TYPU_POPULACE,0);
     vector<int> prirustek_zdravi(POCET_TYPU_POPULACE,0);
@@ -213,7 +212,7 @@ void denniZmena(Populace &pop){
             for(int j = 0; j < POCET_TYPU_KONTAKTU;j++){
                 //pocetkontaktu
                 for (int y = 0; y < popTyp.kontakty[j];y++){
-                    if(chance(RIZIKO_PRENOSU*pes[j][3])){
+                    if(chance(RIZIKO_PRENOSU*podilZdravych*pes[j][3])){
                         int index = chooseOneFromEight(vector<int>{12,12,13,13,13,13,12,12});
                         prirustek_nakazeni[index] += 1;
                         prirustek_zdravi[index] -= 1;
@@ -250,6 +249,20 @@ void denniZmena(Populace &pop){
         popTyp.stavy[imuni].prechod.pop(); 
     }
 
+    //vypocet PES
+    //1.
+    int prirustek = getVectorSum(prirustek_nakazeni,8);
+    
+    //2.
+    int prirustek65 = prirustek_nakazeni[duchodci];
+
+    //3. 
+    double r_cislo = prirustek / (double)posledni_prirustek;
+
+    //4.
+    
+
+
     /*PUSH front*/
     for(TypPopulace &popTyp : pop.typyPopulace){
         popTyp.stavy[nakazeni].prechod.push(prirustek_nakazeni[popTyp.nazevTypu]);
@@ -274,8 +287,18 @@ int main(int argc, char* argv[]){
     ceskaPopulace.typyPopulace[mladsiPracujici].stavy[nakazeni].den[ceskaPopulace.pocetDni] = 1;
     popInfo(ceskaPopulace,0);
 
+    //promenne pro vypocet PES
+    queue<int> pes_prirustek;
+    queue<int> pes_prirustek65;
+    int posledni_prirustek = 0;
+
+    for(int i = 0; i < 14;i++){
+        pes_prirustek.push(0);
+        pes_prirustek65.push(0);
+    }
+
     for (int i = 0; i < 50; i++){
-        denniZmena(ceskaPopulace);
+        denniZmena(ceskaPopulace,pes_prirustek,pes_prirustek65,posledni_prirustek);
         cout << "den " << ceskaPopulace.pocetDni << '\n';
         cout << "Populace - zdravi: " << ceskaPopulace.getstav(zdravi, ceskaPopulace.pocetDni) << '\n';
         cout << "Populace - nakazeni: " << ceskaPopulace.getstav(nakazeni, ceskaPopulace.pocetDni) << '\n';
