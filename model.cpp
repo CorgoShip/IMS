@@ -390,7 +390,7 @@ int pes_vypocet(int prirustek, int prirustek65, double r_cislo, double pozitivit
  */
 void denniZmena(Populace &pop, deque<int> &pes_prirustek,deque<int> &pes_prirustek65, int &posledni_prirustek, int &pes_hodnota){
     vector<vector<double>> pes {
-    {1.0,0.95,0.9,0.9,0.85,0.80},
+    {1.0,0.95,0.9,0.70,0.20,0.03},
     {1.0,0.95,0.80,0.70,0.10,0.05},
     {1.0,1.0,0.5,0.25,0,0},
     {1.0,0.8,0.6,0.2,0.1,0.05},
@@ -544,7 +544,7 @@ int main(int argc, char* argv[]){
         pes_prirustek65.push_back(0);
     }
 
-    for (int i = 0; i < 120; i++){
+    for (int i = 0; i < 220; i++){
         
         if(argc > 1){
             pes = 0;
@@ -571,7 +571,7 @@ int main(int argc, char* argv[]){
     }
     
     if(argc > 1){
-        vystup(ceskaPopulace,pes_vector,"vysledky_pes");
+        vystup(ceskaPopulace,pes_vector,"vysledky");
     }
     else{
         vystup(ceskaPopulace,pes_vector,"vysledky_pes");

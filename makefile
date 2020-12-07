@@ -17,3 +17,4 @@ model : $(OBJ)
 
 run : 
 	./model
+	./model pes off
