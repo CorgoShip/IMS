@@ -182,7 +182,7 @@ int pes_vypocet(int prirustek, int prirustek65, double r_cislo, double pozitivit
  * Změna v populaci za jeden den
  * @param pop populace
  */
-void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirustek65, int &posledni_prirustek){
+void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirustek65, int &posledni_prirustek, int &pes){
     vector<vector<double>> pes {
     {1.0,0.95,0.9,0.9,0.85,0.80},
     {1.0,0.95,0.80,0.70,0.10,0.05},
@@ -252,15 +252,32 @@ void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirust
     //vypocet PES
     //1.
     int prirustek = getVectorSum(prirustek_nakazeni,8);
+    pes_prirustek.push(prirustek);
+    pes_prirustek.pop();
     
+    int prirustek14 = 0;
+    for(int value : pes_prirustek){
+        prirustek14 += value;
+    }
+
     //2.
     int prirustek65 = prirustek_nakazeni[duchodci];
+    pes_prirustek65.push(prirustek65);
+    pes_prirustek65.pop();
+
+    int prirustek6514 = 0;
+    for(int value : pes_prirustek65){
+        prirustek6514 += value;
+    }
 
     //3. 
     double r_cislo = prirustek / (double)posledni_prirustek;
+    posledni_prirustek = prirustek;
 
     //4.
-    
+    double podil_nakazenych = pop.getstav(nakazeni,pop.pocetDni) / 10600000.0; 
+
+    int hodnota_pes = pes_vypocet(prirustek14,prirustek6514,r_cislo,podil_nakazenych);
 
 
     /*PUSH front*/
@@ -291,6 +308,7 @@ int main(int argc, char* argv[]){
     queue<int> pes_prirustek;
     queue<int> pes_prirustek65;
     int posledni_prirustek = 0;
+    int pes = 1;
 
     for(int i = 0; i < 14;i++){
         pes_prirustek.push(0);
@@ -298,10 +316,11 @@ int main(int argc, char* argv[]){
     }
 
     for (int i = 0; i < 50; i++){
-        denniZmena(ceskaPopulace,pes_prirustek,pes_prirustek65,posledni_prirustek);
+        denniZmena(ceskaPopulace,pes_prirustek,pes_prirustek65,posledni_prirustek,pes);
         cout << "den " << ceskaPopulace.pocetDni << '\n';
         cout << "Populace - zdravi: " << ceskaPopulace.getstav(zdravi, ceskaPopulace.pocetDni) << '\n';
         cout << "Populace - nakazeni: " << ceskaPopulace.getstav(nakazeni, ceskaPopulace.pocetDni) << '\n';
+        cout << "pes " << pes << '\n';
     }
     
     vystup(ceskaPopulace,"test1");
