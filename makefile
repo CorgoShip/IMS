@@ -14,3 +14,6 @@ all: model
 
 model : $(OBJ)
 	$(CC) -o model $^ $(CFLAGS) $(LDFLAGS)
+
+run : 
+	./model

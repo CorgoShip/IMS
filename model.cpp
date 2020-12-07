@@ -12,8 +12,9 @@
 #include <string>
 #include <iostream>
 #include <sys/stat.h>
+#include <deque>
 
-#define RIZIKO_PRENOSU 3.8 //šance přenosu v procentech
+#define RIZIKO_PRENOSU 3 //šance přenosu v procentech
 #define POCET_TYPU_POPULACE 8
 #define POCET_STAVU_POPULACE 4
 #define POCET_TYPU_KONTAKTU 7
@@ -31,7 +32,7 @@
 /* Tato funkce je jenom na debugg */
 
 
-void vystup(Populace pop ,string folder){
+void vystup(Populace pop ,vector<int> pes,string folder){
 
     //vytvoreni slozky
     if (mkdir(folder.c_str(),0) == 0){
@@ -47,12 +48,64 @@ void vystup(Populace pop ,string folder){
 
     ofstream outfile;
     outfile.open(folder + "/celkovy_pocet_nakazenych.csv");
-
+    outfile << "Počet nakažených" << '\n';
     for(int value : pocetNakazenych){
-        outfile << value << ',';
+        outfile << value << '\n';
     }
 
     outfile.close();
+
+    //celkovy pocet zdravych
+    vector<int> pocetZdravych;
+    for(int i = 0; i <= pop.pocetDni; i++){
+        pocetZdravych.push_back(pop.getstav(zdravi,i));
+    }
+
+    outfile.open(folder + "/celkovy_pocet_zdravych.csv");
+    outfile << "Počet zdravých" << '\n';
+    for(int value : pocetZdravych){
+        outfile << value << '\n';
+    }
+
+    outfile.close();
+
+    //celkovy pocet imunich
+    vector<int> pocetImunich;
+    for(int i = 0; i <= pop.pocetDni; i++){
+        pocetImunich.push_back(pop.getstav(imuni,i));
+    }
+
+    outfile.open(folder + "/celkovy_pocet_imunich.csv");
+    outfile << "Počet imunních" << '\n';
+    for(int value : pocetImunich){
+        outfile << value << '\n';
+    }
+
+    outfile.close();
+
+    //celkovy pocet mrtvych
+    vector<int> pocetMrtvch;
+    for(int i = 0; i <= pop.pocetDni; i++){
+        pocetMrtvch.push_back(pop.getstav(mrtvi,i));
+    }
+
+    outfile.open(folder + "/celkovy_mrtvych.csv");
+    outfile << "Počet mrtvých" << '\n';
+    for(int value : pocetMrtvch){
+        outfile << value << '\n';
+    }
+
+    outfile.close();
+
+    //histogram PES
+    outfile.open(folder + "/PES_stav.csv");
+    outfile << "Úrověn PES" << '\n';
+    for(int value : pes){
+        outfile << value << '\n';
+    }
+
+    outfile.close();
+
 }
 
 void popInfo(Populace pop, int den){
@@ -335,7 +388,7 @@ int pes_vypocet(int prirustek, int prirustek65, double r_cislo, double pozitivit
  * Změna v populaci za jeden den
  * @param pop populace
  */
-void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirustek65, int &posledni_prirustek, int &pes){
+void denniZmena(Populace &pop, deque<int> &pes_prirustek,deque<int> &pes_prirustek65, int &posledni_prirustek, int &pes_hodnota){
     vector<vector<double>> pes {
     {1.0,0.95,0.9,0.9,0.85,0.80},
     {1.0,0.95,0.80,0.70,0.10,0.05},
@@ -365,7 +418,7 @@ void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirust
             for(int j = 0; j < POCET_TYPU_KONTAKTU;j++){
                 //pocetkontaktu
                 for (int y = 0; y < popTyp.kontakty[j];y++){
-                    if(chance(RIZIKO_PRENOSU*podilZdravych*pes[j][3])){
+                    if(chance(RIZIKO_PRENOSU*podilZdravych*pes[j][pes_hodnota])){
                         int index = chooseOneFromEight(vector<int>{12,12,13,13,13,13,12,12});
                         prirustek_nakazeni[index] += 1;
                         prirustek_zdravi[index] -= 1;
@@ -405,8 +458,8 @@ void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirust
     //vypocet PES
     //1.
     int prirustek = getVectorSum(prirustek_nakazeni,8);
-    pes_prirustek.push(prirustek);
-    pes_prirustek.pop();
+    pes_prirustek.push_back(prirustek);
+    pes_prirustek.pop_front();
     
     int prirustek14 = 0;
     for(int value : pes_prirustek){
@@ -415,8 +468,8 @@ void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirust
 
     //2.
     int prirustek65 = prirustek_nakazeni[duchodci];
-    pes_prirustek65.push(prirustek65);
-    pes_prirustek65.pop();
+    pes_prirustek65.push_back(prirustek65);
+    pes_prirustek65.pop_front();
 
     int prirustek6514 = 0;
     for(int value : pes_prirustek65){
@@ -424,13 +477,31 @@ void denniZmena(Populace &pop, queue<int> &pes_prirustek,queue<int> &pes_prirust
     }
 
     //3. 
-    double r_cislo = prirustek / (double)posledni_prirustek;
+    //cout << "---------------\n";
+    //cout << prirustek << '\n';
+    //cout << posledni_prirustek << '\n';
+
+
+    double r_cislo;
+    if(posledni_prirustek == 0){
+        r_cislo = prirustek;
+    }
+    else{
+        r_cislo = prirustek / (double)posledni_prirustek;
+    }
     posledni_prirustek = prirustek;
 
     //4.
     double podil_nakazenych = pop.getstav(nakazeni,pop.pocetDni) / 10600000.0; 
 
-    int hodnota_pes = pes_vypocet(prirustek14,prirustek6514,r_cislo,podil_nakazenych);
+    //cout << prirustek14 << '\n';
+    //cout << prirustek6514 << '\n';
+    //cout << r_cislo << '\n';
+    //cout << podil_nakazenych << '\n';
+    //cout << "---------------\n";
+
+
+    pes_hodnota = pes_vypocet(prirustek14,prirustek6514,r_cislo,podil_nakazenych);
 
 
     /*PUSH front*/
@@ -458,25 +529,51 @@ int main(int argc, char* argv[]){
     popInfo(ceskaPopulace,0);
 
     //promenne pro vypocet PES
-    queue<int> pes_prirustek;
-    queue<int> pes_prirustek65;
-    int posledni_prirustek = 0;
+    deque<int> pes_prirustek;
+    deque<int> pes_prirustek65;
+    int posledni_prirustek = 1;
     int pes = 1;
+    vector<int> pes_vector;
+    pes_vector.push_back(pes);
 
     for(int i = 0; i < 14;i++){
-        pes_prirustek.push(0);
-        pes_prirustek65.push(0);
+        pes_prirustek.push_back(0);
+        pes_prirustek65.push_back(0);
     }
 
-    for (int i = 0; i < 50; i++){
+    for (int i = 0; i < 120; i++){
+        
+        if(argc > 1){
+            pes = 0;
+        }
+        
         denniZmena(ceskaPopulace,pes_prirustek,pes_prirustek65,posledni_prirustek,pes);
+
+        if(argc > 1){
+            pes = 0;
+        }
+
+        if(ceskaPopulace.getstav(zdravi, ceskaPopulace.pocetDni) <= 0){
+            cout << "Dne " << ceskaPopulace.pocetDni << " byla nakazena cela populace cr, simulace ukoncena\n";
+
+            break;
+        }
+        pes_vector.push_back(pes);
         cout << "den " << ceskaPopulace.pocetDni << '\n';
         cout << "Populace - zdravi: " << ceskaPopulace.getstav(zdravi, ceskaPopulace.pocetDni) << '\n';
         cout << "Populace - nakazeni: " << ceskaPopulace.getstav(nakazeni, ceskaPopulace.pocetDni) << '\n';
+        cout << "Populace - imuni: " << ceskaPopulace.getstav(imuni, ceskaPopulace.pocetDni) << '\n';
+         cout << "Populace - mrtvi: " << ceskaPopulace.getstav(mrtvi, ceskaPopulace.pocetDni) << '\n';
         cout << "pes " << pes << '\n';
     }
     
-    vystup(ceskaPopulace,"test1");
+    if(argc > 1){
+        vystup(ceskaPopulace,pes_vector,"vysledky_pes");
+    }
+    else{
+        vystup(ceskaPopulace,pes_vector,"vysledky_pes");
+    }
+  
 
     //denniZmena(ceskaPopulace);
     //popInfo(ceskaPopulace,100);
