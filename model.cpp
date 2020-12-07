@@ -174,6 +174,159 @@ int chooseOneFromEight(vector<int> vec){
 
 int pes_vypocet(int prirustek, int prirustek65, double r_cislo, double pozitivita_pop){
     int score = 0;
+
+    if (prirustek < 10)
+    {
+        score += 0;
+    }
+    else if (prirustek < 25)
+    {
+        score += 2;
+    }
+    else if (prirustek < 50)
+    {
+        score += 4;
+    }
+    else if (prirustek < 120)
+    {
+        score += 7;
+    }
+    else if (prirustek < 240)
+    {
+        score += 10;
+    }
+    else if (prirustek < 480)
+    {
+        score += 13;
+    }
+    else if (prirustek < 960)
+    {
+        score += 16;
+    }
+    else
+    {
+        score += 20;
+    }
+
+
+    if (prirustek65 < 10)
+    {
+        score += 0;
+    }
+    else if (prirustek65 < 25)
+    {
+        score += 2;
+    }
+    else if (prirustek65 < 50)
+    {
+        score += 4;
+    }
+    else if (prirustek65 < 120)
+    {
+        score += 7;
+    }
+    else if (prirustek65 < 240)
+    {
+        score += 10;
+    }
+    else if (prirustek65 < 480)
+    {
+        score += 13;
+    }
+    else if (prirustek65 < 960)
+    {
+        score += 16;
+    }
+    else
+    {
+        score += 20;
+    }
+
+
+    if (r_cislo < 0.8)
+    {
+        score += 0;
+    }
+    else if (r_cislo < 1.0)
+    {
+        score += 5;
+    }
+    else if (r_cislo < 1.2)
+    {
+        score += 10;
+    }
+    else if (r_cislo < 1.4)
+    {
+        score += 15;
+    }
+    else if (r_cislo < 1.6)
+    {
+        score += 20;
+    }
+    else if (r_cislo < 1.9)
+    {
+        score += 25;
+    }
+    else 
+    {
+        score += 30;
+    }
+
+
+    if (pozitivita_pop < 3)
+    {
+        score += 0;
+    }
+    else if (pozitivita_pop < 7)
+    {
+        score += 3;
+    }
+    else if (pozitivita_pop < 11)
+    {
+        score += 7;
+    }
+    else if (pozitivita_pop < 15)
+    {
+        score += 11;
+    }
+    else if (pozitivita_pop < 19)
+    {
+        score += 15;
+    }
+    else if (pozitivita_pop < 23)
+    {
+        score += 20;
+    }
+    else if (pozitivita_pop < 26)
+    {
+        score += 25;
+    }
+    else 
+    {
+        score += 30;
+    }
+
+
+    if (score < 21)
+    {
+        return 1;       
+    }
+    else if (score < 41)
+    {
+        return 2;
+    }
+    else if (score < 61)
+    {
+        return 3;
+    }
+    else if (score < 76)
+    {
+        return 4;
+    }
+    else
+    {
+        return 5;
+    }
 }
 
 
