@@ -48,7 +48,7 @@ class StavPopulace {
     StavyPopulace nazevStavu;
     vector<int> den; //pocel lidi v danem stavu v kazdem dnu
     queue<int> prechod;
-    void pridatDen(int hodnota, StavyPopulace nazevStavu);
+    void pridatDen(int hodnota);
 };
 
 class TypPopulace {
